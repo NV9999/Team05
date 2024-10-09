@@ -7,6 +7,8 @@ const app = express();
 // Middleware for parsing JSON
 app.use(express.json());
 
+app.use('/api/auth', authRoutes);
+
 // MongoDB Connection String directly in mongoose.connect
 mongoose.connect('mongodb+srv://10viranininad:ninad123@cluster0.obtu6jf.mongodb.net/team05?retryWrites=true&w=majority&appName=Cluster0', {
     useNewUrlParser: true,
