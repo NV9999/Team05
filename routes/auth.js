@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');  // Adjust the path to your models folder
 const router = express.Router();
@@ -12,12 +13,13 @@ const JWT_SECRET = 'your_jwt_secret_key'; // Use a secure key in production
 const transporter = nodemailer.createTransport({
     service: 'Gmail', // Adjust the email service accordingly
     auth: {
-        user: 'your_email@example.com', // Your email
-        pass: 'your_email_password' // Your email password or app-specific password
+        user: 'notoriousgamingpubg@gmail.com', // Your email
+        pass: 'byqc gavt nwlr ajmx' // Your email password or app-specific password
     }
 });
 
 // User signup route - Step 1: Email, password, confirm password, and send verification code
+// Signup route
 router.post('/signup', async (req, res) => {
     try {
         const { email, password, confirm_password } = req.body;
@@ -40,8 +42,9 @@ router.post('/signup', async (req, res) => {
         // Generate a verification code
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit verification code
 
-        // Create new user with the hashed password and verification code
+        // Create new user with auto-generated user_id, hashed password, and verification code
         const newUser = new User({
+            user_id: uuidv4(), // Auto-generate user_id
             email,
             password_hash: hashedPassword,
             verification_code: verificationCode, // Store the verification code
@@ -51,7 +54,7 @@ router.post('/signup', async (req, res) => {
 
         // Send verification email
         const mailOptions = {
-            from: 'your_email@example.com',
+            from: 'notoriousgamingpubg@gmail.com',
             to: email,
             subject: 'Verification Code',
             text: `Your verification code is: ${verificationCode}`
@@ -66,6 +69,7 @@ router.post('/signup', async (req, res) => {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 });
+
 
 // Verify code route - Step 2: User submits the verification code
 router.post('/verify', async (req, res) => {
@@ -113,6 +117,89 @@ router.post('/complete-registration', async (req, res) => {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 });
+
+// POST: Forgot Password - Step 1: Provide email to receive verification code
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        // Check if user exists
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Generate a verification code
+        const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit verification code
+
+        // Store the verification code in the user's record
+        user.verification_code = verificationCode;
+        await user.save();
+
+        // Send verification email
+        const mailOptions = {
+            from: 'notoriousgamingpubg@gmail.com',
+            to: email,
+            subject: 'Password Reset Verification Code',
+            text: `Your password reset verification code is: ${verificationCode}`
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).json({ message: 'Verification code sent to your email.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+// POST: Verify code - Step 2: Verify the provided verification code
+router.post('/verify-password-code', async (req, res) => {
+    try {
+        const { email, verification_code } = req.body;
+
+        // Find the user by email
+        const user = await User.findOne({ email });
+        if (!user || user.verification_code !== verification_code) {
+            return res.status(400).json({ message: 'Invalid verification code' });
+        }
+
+        res.status(200).json({ message: 'Verification code is correct. You may now reset your password.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+// POST: Reset password - Step 3: Submit new password after verifying the code
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { email, new_password, confirm_password } = req.body;
+
+        // Validate password match
+        if (new_password !== confirm_password) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+        }
+
+        // Find the user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Hash the new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(new_password, salt);
+
+        // Update the user's password and clear the verification code
+        user.password_hash = hashedPassword;
+        user.verification_code = undefined; // Clear verification code after success
+        await user.save();
+
+        res.status(200).json({ message: 'Password reset successfully.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
 
 
 
