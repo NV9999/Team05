@@ -7,7 +7,7 @@ const User = require('../models/User');  // Adjust the path to your models folde
 const router = express.Router();
 
 // Secret key for JWT (in production, store this securely)
-const JWT_SECRET = 'your_jwt_secret_key'; // Use a secure key in production
+const JWT_SECRET = 'pragnesh-BAAPU'; // Use a secure key in production
 
 // Configure nodemailer for sending verification emails
 const transporter = nodemailer.createTransport({
@@ -195,6 +195,33 @@ router.post('/reset-password', async (req, res) => {
         await user.save();
 
         res.status(200).json({ message: 'Password reset successfully.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+
+// User login route
+router.post('/login', async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Find the user by email
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+
+        // Compare password with hashed password
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid credentials' });
+        }
+
+        // Generate JWT token
+        const token = jwt.sign({ user_id: user._id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
+
+        res.json({ message: 'Login successful', token });
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message });
     }

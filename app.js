@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
+const authMiddleware = require('./routes/authMiddleware');
 
 // Create the Express app
 const app = express();
