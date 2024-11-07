@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const RentalAgreementSchema = new mongoose.Schema({
     agreement_id: { type: String, required: true, unique: true },  // Unique agreement identifier
-    tenant_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Foreign key reference to User model (tenant)
+    user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Foreign key reference to User model (tenant)
     start_date: { type: Date, required: true },  // Start date of the rental agreement
     end_date: { type: Date, required: true },  // End date of the rental agreement
     monthly_rent: { type: Number, required: true },  // Monthly rent amount
