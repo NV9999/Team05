@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const hallBookingRoutes = require('./routes/hallBookingRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
-//const noticeRoutes = require('./routes/noticeRoutes');
+const noticeRoutes = require('./routes/noticeRoutes');
 
 // Create the Express app
 const app = express();
@@ -14,7 +14,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/hallBooking',hallBookingRoutes);
 app.use('/api/complaint', complaintRoutes);
-//app.use('/api/notice',noticeRoutes);
+app.use('/api/notice',noticeRoutes);
 
 
 // MongoDB Connection String directly in mongoose.connect
