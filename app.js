@@ -5,6 +5,8 @@ const hallBookingRoutes = require('./routes/hallBookingRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
 const noticeRoutes = require('./routes/noticeRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
+const rentRoutes = require('./routes/rentRoutes');
+const profileRoutes = require('./routes/profileRoutes');
 
 // Create the Express app
 const app = express();
@@ -17,6 +19,8 @@ app.use('/api/hallBooking',hallBookingRoutes);
 app.use('/api/complaint', complaintRoutes);
 app.use('/api/notice',noticeRoutes);
 app.use('/api/services',serviceRoutes);
+//app.use('/api/rentPayment',rentRoutes);
+//app.use('/api/profile',profileRoutes);
 
 
 // MongoDB Connection String directly in mongoose.connect
