@@ -3,7 +3,14 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 const User = require('../models/User');
+const multer = require('multer');
 const authMiddleware = require('./authMiddleware');
+
+
+
+// Set up Multer Storage
+const storage = multer.memoryStorage(); // Store images in memory
+const upload = multer({ storage: storage }).single('profile_image'); // Expecting the file to come in as 'profile_image'
 
 // 1. Profile Route - Get user's profile details
 router.get('/profile', authMiddleware, async (req, res) => {
@@ -58,21 +65,26 @@ router.post('/profile/password', authMiddleware, async (req, res) => {
 });
 
 // 3. Manage Profile Route - Update profile image
-router.post('/profile/manageProfile', authMiddleware, async (req, res) => {
+// Route to handle profile image update
+router.post('/profile/manageProfile', authMiddleware, upload, async (req, res) => {
     try {
-        const { profile_image } = req.body;
-
-        if (!profile_image) {
+        // Check if the image was uploaded
+        if (!req.file) {
             return res.status(400).json({ message: 'Profile image is required' });
         }
 
-        const user = await User.findById(req.user._id);
+        // Retrieve the user from the database
+        const user = await User.findById(req.user.user_id);
 
+        // Check if user exists
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        user.profile_image = profile_image;
+        // Convert the uploaded image into a buffer and save it to the user's profile_image field
+        user.profile_image = req.file.buffer; // Store image buffer directly in the DB
+
+        // Save the updated user document
         await user.save();
 
         res.status(200).json({ message: 'Profile image changed successfully' });
@@ -84,13 +96,7 @@ router.post('/profile/manageProfile', authMiddleware, async (req, res) => {
 // 4. Logout Route - Unassign JWT token
 router.post('/profile/logout', (req, res) => {
     try {
-        // Clear the token by setting an empty cookie
-        res.cookie('token', '', { 
-            httpOnly: true,  // Ensure cookie is accessible only by the server
-            secure: true,    // Ensure cookie is sent only over HTTPS
-            sameSite: 'Strict', // Prevent CSRF by restricting the cookie to same-site requests
-            expires: new Date(0) // Expire the cookie immediately
-        });
+        res.header("Authorization", "");
         res.status(200).json({ message: 'You logged out successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
