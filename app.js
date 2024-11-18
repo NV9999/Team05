@@ -8,6 +8,7 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const rentRoutes = require('./routes/rentRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const connectDB = require('./database connection/db');
+const adminLoginRoutes = require('./routes/adminRoutes/adminLoginRoutes');
 
 // Create the Express app
 const app = express();
@@ -22,6 +23,7 @@ app.use('/api/notice',noticeRoutes);
 app.use('/api/services',serviceRoutes);
 //app.use('/api/rentPayment',rentRoutes);
 app.use('/api/profile',profileRoutes);
+app.use('/api/adminLoginRoutes',adminLoginRoutes);
 
 // Connect to MongoDB
 connectDB();
