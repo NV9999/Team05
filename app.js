@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+//const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const hallBookingRoutes = require('./routes/hallBookingRoutes');
 const complaintRoutes = require('./routes/complaintRoutes');
@@ -7,6 +7,7 @@ const noticeRoutes = require('./routes/noticeRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const rentRoutes = require('./routes/rentRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const connectDB = require('./database connection/db');
 
 // Create the Express app
 const app = express();
@@ -20,16 +21,10 @@ app.use('/api/complaint', complaintRoutes);
 app.use('/api/notice',noticeRoutes);
 app.use('/api/services',serviceRoutes);
 //app.use('/api/rentPayment',rentRoutes);
-//app.use('/api/profile',profileRoutes);
+app.use('/api/profile',profileRoutes);
 
-
-// MongoDB Connection String directly in mongoose.connect
-mongoose.connect('mongodb+srv://10viranininad:ninad123@cluster0.obtu6jf.mongodb.net/team05?retryWrites=true&w=majority&appName=Cluster0', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-    .then(() => console.log('MongoDB connected'))
-    .catch((err) => console.error('Connection error', err));
+// Connect to MongoDB
+connectDB();
 
 // Basic route
 app.get('/', (req, res) => {
