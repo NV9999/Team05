@@ -10,10 +10,11 @@ const HallBookingSchema = new mongoose.Schema({
     hallName: { type: String, required: true },  // Name of the hall being booked
     status: { 
         type: String, 
-        enum: ['pending', 'approved', 'rejected', 'cancelled'], 
+        enum: ['pending', 'approved', 'rejected'], 
         default: 'pending'  // Status of the booking
     },
     RejectionReason: { type: String },  // Reason for rejection, if status is 'rejected'
+    approvalReason: { type: String }, // Reason for approval, if status is 'approved'
     admin_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },  // Admin/manager approving the booking
     InsightHallAmenities: {  // Amenities specific to Insight Hall
         type: [String],
