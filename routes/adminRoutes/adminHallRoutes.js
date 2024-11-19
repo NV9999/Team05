@@ -36,13 +36,9 @@ router.get('/halls/:id', adminMiddleware, async (req, res) => {
     }
 });
 
-// 3. Approve or Reject a booking
-router.put('/halls/:id/status', adminMiddleware, async (req, res) => {
-    const { status, comments } = req.body;
-
-    if (!['approved', 'rejected'].includes(status)) {
-        return res.status(400).json({ error: 'Invalid status' });
-    }
+// Approve a booking
+router.put('/halls/:id/approve', adminMiddleware, async (req, res) => {
+    const { comments } = req.body; // Admin comments for approval
 
     try {
         const hallBooking = await HallBooking.findById(req.params.id);
@@ -51,19 +47,44 @@ router.put('/halls/:id/status', adminMiddleware, async (req, res) => {
             return res.status(404).json({ error: 'Hall booking not found' });
         }
 
-        if (status === 'approved') {
-            hallBooking.status = 'approved';
-            hallBooking.approvalReason = comments;
-        } else if (status === 'rejected') {
-            hallBooking.status = 'rejected';
-            hallBooking.rejectionReason = comments;
+        if (hallBooking.status !== 'pending') {
+            return res.status(400).json({ error: 'Only pending bookings can be approved' });
         }
+
+        hallBooking.status = 'approved';
+        hallBooking.approvalReason = comments;
 
         await hallBooking.save();
 
-        res.status(200).json({ message: `Booking ${status} successfully`, hallBooking });
+        res.status(200).json({ message: 'Booking approved successfully', hallBooking });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to update booking status' });
+        res.status(500).json({ error: 'Failed to approve booking' });
+    }
+});
+
+// Reject a booking
+router.put('/halls/:id/reject', adminMiddleware, async (req, res) => {
+    const { comments } = req.body; // Admin comments for rejection
+
+    try {
+        const hallBooking = await HallBooking.findById(req.params.id);
+
+        if (!hallBooking) {
+            return res.status(404).json({ error: 'Hall booking not found' });
+        }
+
+        if (hallBooking.status !== 'pending') {
+            return res.status(400).json({ error: 'Only pending bookings can be rejected' });
+        }
+
+        hallBooking.status = 'rejected';
+        hallBooking.rejectionReason = comments;
+
+        await hallBooking.save();
+
+        res.status(200).json({ message: 'Booking rejected successfully', hallBooking });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to reject booking' });
     }
 });
 
