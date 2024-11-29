@@ -5,7 +5,7 @@ const ServiceSchema = new mongoose.Schema({
     user_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },  // Foreign key reference to User
     admin_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },  // Admin handling the service
     service_number: { type: String, required: true, unique: true }, // Unique service number
-    service_status: { type: String, enum: ['pending', 'resolved', 'in_progress'], default: 'pending' },  // Status of the service
+    service_status: { type: String, enum: ['pending', 'resolved'], default: 'pending' },  // Status of the service
     service_submissionDate: { type: Date, default: Date.now },  // Date when service was requested
     service_title: { type: String, required: true },  // Title of the service request
     service_description: { type: String, required: true },  // Description of the service request

@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const HallBooking = require('../../models/HallBooking');
 const User = require('../../models/User');
-
-// Middleware for admin authentication (JWT, optional)
+const Admin = require('../../models/Admin');
 const adminMiddleware = require('../adminRoutes/adminMiddleware/adminMiddleware');
 
 // 1. Get all hall bookings

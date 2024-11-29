@@ -10,6 +10,8 @@ const profileRoutes = require('./routes/profileRoutes');
 const connectDB = require('./database connection/db');
 const adminLoginRoutes = require('./routes/adminRoutes/adminLoginRoutes');
 const adminHallRoutes = require('./routes/adminRoutes/adminHallRoutes');
+const adminComplaints = require('./routes/adminRoutes/adminComplaints');
+const adminServiceRoutes = require('./routes/adminRoutes/adminServiceRoutes');
 
 // Create the Express app
 const app = express();
@@ -26,6 +28,8 @@ app.use('/api/services',serviceRoutes);
 app.use('/api/profile',profileRoutes);
 app.use('/api/adminLoginRoutes',adminLoginRoutes);
 app.use('/api/adminHallRoutes',adminHallRoutes);
+app.use('/api/adminComplaints',adminComplaints);
+//app.use('/api/adminServiceRoutes',adminServiceRoutes);
 
 // Connect to MongoDB
 connectDB();

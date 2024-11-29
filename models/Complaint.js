@@ -12,7 +12,7 @@ const ComplaintSchema = new mongoose.Schema({
     description: { type: String, required: true },  // Description of the complaint
     status: { 
         type: String, 
-        enum: ['pending', 'resolved', 'in_progress'], 
+        enum: ['pending', 'resolved'], 
         default: 'pending'  // Status of the complaint
     },
     priority_level: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },  // Priority level of the complaint
